@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load crispy_forms_field %}
+{% load static %}
+{% block content %}
+    {{ force_refresh|safe }}
+    <div id="choose-store-container">
+        <h4 id="greeting">Hello {{ user.first_name }},</h4>
+        <h2>Current Store: {{ store.store_name }}</h2>
+        <p>To change store, simply select from the list below and hit submit!</p>
+        <p>If you are only registered with one store, but would like to add more, please select "Add more", and follow the on-screen instructions</p>
+    {% if staff == "NOT STAFF" %}
+        <form id="choose-store-form" method="post">
+        {% csrf_token %}
+        <select id="choose-store" name="choose-store">
+            {{ store_selection|safe }}
+        </select>
+        <br>
+        <button type="submit">SUBMIT</button>
+        </form>
+        {% else %}
+            <form id="staff-choose-store-form" method="post">
+            {% csrf_token %}
+            <select id="choose-store-staff" name="choose-store-staff">
+            {{ store_selection|safe }}
+        </select>
+        <br>
+        <button type="submit">SUBMIT</button>
+        </form>
+    {% endif %}
+    </div>
+{% endblock %}

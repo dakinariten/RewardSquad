@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% if store_user.user_type == "MCHT" or store_user.user_type == "ADMN" %}
+    <h1>{{ store.store_name }}</h1>
+    <h2>Reward Point Scheme Adjustment</h2>
+    <h3>Explanation:</h3>
+    <p>Reward Points are awarded on a per-sale basis, however the level of points given
+    is completely personal. Generally, the assumption is that 1 point = €1, since that
+    preserves the feeling of money for customers. It is easier to keep track of, and
+    typically works best.</p>
+    <p>However, that said, how much customers need to spend to earn 1 point is the
+    primary method of adjustment. The standard is for every €10 spent, you get 1 point.
+    This equates to 10% discount, making it worthwhile for the customers. It can be
+    increased, or decreased, at any time (e.g. special "double points" events) etc.</p>
+    <div id="rp-adjustment-container">
+    <h4>Current RP:€ (Reward Points to Euro) Ratio</h4>
+    <h2>€1.00 to {{ store.rp_euro_ratio }} RP</h2>
+    <div id="update-rp">
+        <form id="update-rp-form" method="post">
+            {% csrf_token %}
+            <input step="0.001" name="new-rp-ratio" id="new-rp" type="number" min="0" placeholder="Enter number of RP per Euro Spent" required>
+            <button id="update-rp-btn" type="submit">Update Points Ratio</button>
+        </form>
+    </div>
+    </div>
+    {% else %}
+    {% if user_type == "CUST" %}
+            <meta http-equiv="refresh" content="6; /" />
+        {% else %}
+            <meta http-equiv="refresh" content="6; /shop/" />
+        {% endif %}
+    <h1>Sorry {{ user.first_name }}</h1>
+    <h3>This is embarrassing for us both...</h3>
+    <p>You do not have permission to view this page</p>
+{% endif %}
+{% endblock %}

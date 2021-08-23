@@ -1,0 +1,172 @@
+{%  extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+<script src="{% static 'js/html5-qrcode.min.js' %}"></script>
+{% if staff == "NOT STAFF" %}
+    <div>
+{#    If you're not staff - display message, and force redirect#}
+        <meta http-equiv="refresh" content="4; /" />
+        <h1>ERROR - You do not Have Permission to View Page</h1>
+        <h3>If you believe this to be in error, please contact Support</h3>
+    </div>
+{% endif %}
+{% if staff != "NOT STAFF" %}
+    {% if store_user not in staff %}
+        <h1>This is embarrassing...</h1>
+        <h3>This section is reserved for staff members of {{ store.store_name }}</h3>
+        <p>You may have changed to a different store, or be looking for another page! To change store, click the link below.</p>
+        <p>Otherwise, click any of the other links (or wait - you will be redirected shortly)</p>
+        <button id="choose-store-shop" onclick="window.location.href='/choose-store/'">Choose Store</button>
+        <meta http-equiv="refresh" content="60; /" />
+    {% endif %}
+    {% if store_user in staff %}
+    <div id="display-container">
+        <div id="checkout-container">
+            <h1 id="status"></h1>
+            <div id="checkout-stage-2">
+                <div class="contentRowScan">
+                    {#    Order Status Display - Fade out controlled by rewardSquad.js #}
+                    <h1 id="order-status">{{ STATUS }}</h1>
+                    {#    Order Summary Table - populated by viewOrder function#}
+                    <div id="table-container">
+                        <table id="table" data-url="{% url 'ajax_posting' %}"></table>
+                    </div>
+                    {#    Barcode / Camera Container#}
+                    <div id='barcode-scanner-container' class="contentCol">
+                        <a id="scan-a" onclick="closeScanner()">
+                            <h2 id="closeScan">[X] Close Scan</h2>
+                        </a>
+                        <br>
+                        <div id="scan">
+                            <div id="qr-reader">
+                            </div>
+                            <div id="qr-reader-results">
+                            </div>
+                        </div>
+                    </div>
+                    <div id='product-info-output' class="contentCol">
+            {#            Product Search display#}
+                        <h1 id="product-title"></h1>
+                        <h4 id="product-manufacturer"></h4>
+                        <h4 id="product-code"></h4>
+                        <h1 id="product-price"></h1>
+                    </div>
+                    <div class="contentCol">
+                        <form id="add-to-order" method="post" data-url="{% url 'checkout' %}">
+                            {% csrf_token %}
+                            <div id="order-buttons">
+                {#                eCom buttons - hidden fields to transmit required data #}
+{#                                Hidden field to pass order ID from conditional paths in view #}
+                                <input id="order-id-hidden" type="hidden" value="">
+                                <input id="product-code-hidden" type="hidden" value="">
+                                <label for="quantity" name="quantity-label">Quantity:</label>
+                                <input id="quantity" type="number" value="1" min="0" oninput="validity.valid||(value='');">
+                                <button id="add-prod-to-order" type="submit">Add to Order</button>
+                                <button id="clear-selection" type="button" onclick="clearSelection();">Clear Selection</button>
+                            </div>
+                        </form>
+            {#        Order buttons container for extended fuctions#}
+                        <div id="view-order-container">
+                            <form id="view-order-form" method="post" data-url="{% url 'checkout' %}">
+                                {% csrf_token %}
+                                <button id="view-order" type="submit" onclick="viewOrder();">View Current Order</button>
+                                <button id="continue-shopping" type="button" onclick="qrScanBarcode();toggleViewOrderButton();">Continue Shopping</button>
+                            </form>
+                            <form id="payment" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" id="order_id" name="order_id" value="">
+                                <button name="request-checkout" id="request-checkout" type="submit"  value="1">Proceed to Payment</button>
+                            </form>
+                            <form id="cancel-order-form" method="post">
+                                {% csrf_token %}
+                                <button name="cancel-order" id="cancel-order" name="cancel-order" type="submit" value="1">Cancel Order</button>
+                            </form>
+                        </div>
+            {#        On Page load, if there is an order - show user the View Order Button: hidden by default #}
+                        {% if orders != "NA" %}
+                            <script>
+                                document.getElementById('view-order-container').style.display = "block";
+                                    $(document).ready(function(){
+                                        $('view-order-container').children().css({'display': 'block'});});
+                                        document.getElementById('continue-shopping').style.display = "none";
+                                        document.getElementById('cancel-order').style.display = "none";
+                                        document.getElementById('request-checkout').style.display = "none";
+
+                            </script>
+                        {% endif %}
+                    </div>
+                </div>
+                    <div id="launch-cam-container">
+                        <button id='launch-cam' onclick='qrScanBarcode();'>Launch Camera</button>
+                    </div>
+                    <br>
+                    <div class="contentCol">
+                        <form id="product-search" method="post" data-url="{% url 'ajax_posting' %}">
+                            {% csrf_token %}
+                            {{ forms.ProductForm }}
+                            <button id="product-search-button" type="submit">Search Product</button>
+                        </form>
+                    </div>
+            </div>
+            <div id="checkout-stage-1">
+                <div id="scan-stg1">
+                    <h3>Scan QR Code (or enter UID below)</h3>
+                    <div id="qr-reader1"></div>
+                </div>
+                <form id="uid-checkout" data-url="{% url 'checkout' %}" method="post">
+                    {% csrf_token %}
+                    <label for="uid-checkout-user">Enter UID: </label>
+                    <input type="number" min="0" id="uid-checkout-user" required="required">
+                    <button id="uid-checkout-submit" type="submit">Create Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{# If you are Staff, display main Containt #}
+    <div class="contentRowShop">
+        <div id="userInfo" class="contentCol">
+{#            Remind user what store they're viewing & position #}
+            <h1>{{ status }}</h1>
+            <p>Logged in as {{ user.username }}</p>
+            <h2>User Type: {{ staff.0.user_type }}</h2>
+            <h3>Store: {{ staff.0.store_id }}</h3>
+        </div>
+    </div>
+    <br>
+    <div class="contentRowShop">
+        <div id="shop-content-col-container" class="contentCol">
+            <a href="/shop/#shop-rp-balance"><div class="mainSelectionNav accordion">REWARD POINTS</div></a>
+            <a href="#"><div id="" class="mainSelectionNav active">CHECKOUT</div></a>
+            <a href="/register"><div class="mainSelectionNav">ADD CUSTOMER</div></a>
+            <div class="mainSelectionNav accordion" id="pending-orders" name="pending-orders" value="1" data-url="{% url 'shop' %}">PENDING ORDERS</div>
+                <div class="accordionBody" id="pending-orders-body">
+                    <form id="order-update" method="post" data-url="{% url 'shop' %}">
+                        {% csrf_token %}
+                        <div id="table-container"><table id="order-table"></table></div>
+                    </form>
+                </div>
+            {% if staff.0.user_type == "MCHT" %}
+                <a href="/user-management/"><div id="" class="mainSelectionNav">USER MANAGEMENT</div></a>
+                <a href="#"><div id="" class="mainSelectionNav">VIEW ANALYTICS</div></a>
+                <a href="/adjust-points/"><div id="" class="mainSelectionNav">ADJUST POINTS</div></a>
+                <a href="/shop/submit-product/"><div id="" class="mainSelectionNav">SUBMIT PRODUCT INFORMATION</div></a>
+                {% endif %}
+            <br>
+        </div>
+    </div>
+    {% endif %}
+{% endif %}
+    <script>
+        accordionBalance();
+        qrScanPoints();
+        pendingOrders();
+        approveDenyPending();
+        qrUidCheckout();
+        productSearch();
+        addToOrder();
+        rpOrderTotalUpdate();
+        updateOrderQty();
+        offersCartView();
+    </script>
+{% endblock %}

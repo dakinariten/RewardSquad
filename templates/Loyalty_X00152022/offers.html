@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load crispy_forms_field %}
+{% load static %}
+{% block content %}
+    {#    Bootstrap stylesheet #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    {#End Bootstrap#}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <div id="offers-page-container">
+    <div id="greeting-container">
+        <h1>Specials & Offers</h1>
+        <h3>from {{ store.store_name }}</h3>
+    </div>
+    {% if store_user in staff %}
+        <div id="create-offer-container">
+            <button class="btn btn-success" id="create-offer" name="create-offer" value="{{ user.id }}" type="button" data-bs-toggle="modal" data-bs-target="#modal-create-offer">Create Offer</button>
+        </div>
+        <div class="modal fade" id="modal-create-offer" tabindex="-1" aria-labelledby="modal-create-offer" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                        <div class="modal-body">
+                            <form id="create-offer-form" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                    <label for="create-offer-title">Special Offer Title</label>
+                                    <input name="create-offer-title" id="create-offer-title" type="text" required>
+                                    <div class="offer-row">
+                                        <div class="offer-image-container">
+                                                <label for="create-offer-image">Upload main image for offer</label>
+                                                <input type="file" id="create-offer-image" name="create-offer-image" accept="image/*">
+                                        </div>
+                                    </div>
+                                        <label for="create-offer-text-short">Preview Text (main screen):</label>
+                                        <textarea name="create-offer-text-short" id="create-offer-text-short" required></textarea>
+                                        <label for="create-offer-text-long">Full Length description</label>
+                                    <textarea name="create-offer-text-long" id="create-offer-text-long"></textarea>
+                                    <div class="offer-col-modal">
+                                        <label for="offer-start-date-{{ offer.id }}">Start Date</label>
+                                        <input type="date" name="offer-start-date" id="offer-start-date-{{ offer.id }}" required>
+                                        <label for="offer-end-date-{{ offer.id }}">End Date</label>
+                                        <input type="date" name="offer-end-date" id="offer-end-date-{{ offer.id }}" required>
+                                        <label for="create-offer-price">Price: €</label>
+                                        <input type="text" id="create-offer-price" name="create-offer-price" required>
+                                    </div>
+                                <div class="modal-footer">
+                                        <button id="create-offer-save" name="create-offer-save" type="submit" class="btn btn-success" value="create-offer-save">Save</button>
+                                        <button id="create-offer-cancel" name="create-offer-cancel" type="button" data-bs-dismiss="modal" class="btn btn-danger">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% for offer in offers %}
+        <div id="offer-container-{{ offer.id }}" class="offer-container" data-bs-toggle="modal" data-bs-target="#modal-{{ offer.id }}">
+            <div class="offer-col-1">
+                <div class="offer-image-container">
+                    <img src="{% static offer.image_url %}">
+                </div>
+            </div>
+            <div class="offer-col-2">
+                <div class="offer-col-2">
+                    <h3>{{ offer.offer_title }}</h3>
+                    <p>{{ offer.offer_text_short }}</p>
+                    <a data-bs-toggle="modal" data-bs-target="#modal-{{ offer.id }}">READ MORE...</a>
+                </div>
+                <div class="offer-row">
+                    <div class="offer-row"><h2>€{{ offer.price|floatformat:2 }}</h2></div>
+                    <div class="offer-row">
+                        <button id="btn-{{ offer.id }}" type="button" data-bs-toggle="modal" data-bs-target="#modal-{{ offer.id }}"><span class="material-icons">launch</span>View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+{#        Modal Window #}
+        <div class="modal fade" id="modal-{{ offer.id }}" tabindex="-1" aria-labelledby="modal-{{ offer.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="offertitle-{{ offer.id }}">{{ offer.offer_title }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                        <div class="modal-body">
+                            <form id="offer-{{ offer.id }}-form" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                    <label style="display: none" for="offer-title-{{ offer.id }}">Special Offer Title</label>
+                                    <input name="offer-title" id="offer-title-{{ offer.id }}" type="text" value="{{ offer.offer_title}}" style="display: none" required>
+                                    <div class="offer-row">
+                                        <div class="offer-image-container">
+                                                <label for="image-select-{{ offer.id }}" style="display: none">Upload main image for offer</label>
+                                                <input type="file" id="image-select-{{ offer.id }}" name="image-select" value='test' style="display: none" accept="image/*">
+                                            <img id="offerimage-{{ offer.id }}" src="{% static offer.image_url %}">
+                                        </div>
+                                    </div>
+                                        <label style="display: none" for="offer-text-short-{{ offer.id }}">Preview Text (main screen):</label>
+                                        <textarea name="offer-text-short" id="offer-text-short-{{ offer.id }}" style="display: none" required>{{ offer.offer_text_short }}</textarea>
+                                        <label style="display: none" for="offer-text-long-{{ offer.id }}">Full Length description</label>
+                                    <textarea name="offer-text-long" id="offer-text-long-{{ offer.id }}" style="display:none;">{{ offer.offer_text_long }}</textarea>
+                                    <div class="offer-col-modal">
+                                        <p id="offertextlong-{{ offer.id }}">{{ offer.offer_text_long }}</p>
+                                        <label for="offer-start-date-{{ offer.id }}" style="display: none">Start Date</label>
+                                        <input type="date" name="offer-start-date" id="offer-start-date-{{ offer.id }}" style="display: none" required value="{{ offer.date_start|date:"Y-m-d" }}">
+                                        <label for="offer-end-date-{{ offer.id }}" style="display: none">End Date</label>
+                                        <input type="date" name="offer-end-date" id="offer-end-date-{{ offer.id }}" style="display: none" required value="{{ offer.date_end|date:"Y-m-d" }}">
+                                        <label style="display: none" for="offerpriceedit-{{ offer.id }}">Price: €</label>
+                                        <input type="text" id="offerpriceedit-{{ offer.id }}" value="{{ offer.price|floatformat:2 }}" style="display: none" name="offerpriceedit" required>
+                                        <h1 id="offerpricedisplay-{{ offer.id }}">€{{ offer.price|floatformat:2 }}</h1>
+                                    </div>
+
+                                <div class="modal-footer">
+                                    <input name="offer-price" type="hidden" value="{{ offer.price }}" id="offer-price-{{ offer.id }}">
+                                    <label id="qtylabel-{{ offer.id }}" for="qty-{{ offer.id }}">Quantity:</label>
+                                    <input default="1" type="number" name="qty" id="qty-{{ offer.id }}" min=0 placeholder="Enter Quantity" required>
+                                    <button name="cart" value="{{ offer.id }}" id='cart-{{ offer.id }}' type="submit">Add to Cart</button>
+                                    {% if store_user in staff %}
+                                        <button id="edit-{{ offer.id }}" name="edit-offer" type="button" onclick="editOffers({{ offer.id }})" class="btn btn-success">Edit Offer</button>
+                                        <button style="display: none" id="save-offer-{{ offer.id }}" name="save-offer" type="submit" class="btn btn-success" value="{{ offer.id }}">Save Changes</button>
+                                        <button style="display: none" id="cancel-{{ offer.id }}" name="cancel" type="button" data-bs-dismiss="modal" class="btn btn-danger">Cancel</button>
+                                    {% endif %}
+                                    <button id="close-{{ offer.id }}" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </form>
+                        </div>
+                </div>
+            </div>
+</div>
+    {% endfor %}
+    </div>
+
+{% endblock %}

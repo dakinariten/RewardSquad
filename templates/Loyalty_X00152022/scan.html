@@ -1,0 +1,114 @@
+{%  extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+{# Load javascript needed for Scanner #}
+<script src="{% static 'js/html5-qrcode.min.js' %}"></script>
+    <div class="contentRowScan">
+{#    Order Status Display - Fade out controlled by rewardSquad.js #}
+        <h1 id="order-status">{{ STATUS|safe }}</h1>
+{#    Order Summary Table - populated by viewOrder function#}
+        <div id="table-container">
+            <table id="table" data-url="{% url 'ajax_posting' %}"></table>
+        </div>
+{#    Barcode / Camera Container#}
+        <div id='barcode-scanner-container' class="contentCol">
+            <a id="scan-a" onclick="closeScanner()">
+                <h2 id="closeScan">[X] Close Scan</h2>
+            </a>
+            <br>
+            <div id="scan">
+                <div id="qr-reader">
+                </div>
+                <div id="qr-reader-results">
+                </div>
+            </div>
+        </div>
+        <div id='product-info-output' class="contentCol">
+{#            Product Search display#}
+            <h1 id="product-title"></h1>
+            <h4 id="product-manufacturer"></h4>
+            <h4 id="product-code"></h4>
+            <h1 id="product-price"></h1>
+        </div>
+        <div class="contentCol">
+            <form id="add-to-order" method="post" data-url="{% url 'scan' %}">
+                {% csrf_token %}
+                <div id="order-buttons">
+    {#                eCom buttons - hidden fields to transmit required data #}
+                    <input id="product-code-hidden" type="hidden" value="">
+                    <label for="quantity" name="quantity-label">Quantity:</label>
+                    <input id="quantity" type="number" value="1" min="0" oninput="validity.valid||(value='');">
+                    <button id="add-prod-to-order" type="submit">Add to Order</button>
+                    <button id="clear-selection" type="button" onclick="clearSelection();">Clear Selection</button>
+                </div>
+            </form>
+{#        Order buttons container for extended fuctions#}
+            <div id="view-order-container">
+                <form id="view-order-form" method="post" data-url="{% url 'scan' %}">
+                    {% csrf_token %}
+                    <button id="view-order" type="submit" onclick="viewOrder();">View Current Order</button>
+                    <button id="continue-shopping" type="button" onclick="location.href='/scan/';">Continue Shopping</button>
+                </form>
+                <form id="request-checkout-form" method="post">
+                    {% csrf_token %}
+                    <button name="request-checkout" id="request-checkout" type="submit"  value="1">Request Checkout</button>
+                </form>
+                <form id="cancel-order-form" method="post">
+                    {% csrf_token %}
+                    <button name="cancel-order" id="cancel-order" type="submit" value="1">Cancel Order</button>
+                </form>
+            </div>
+{#        On Page load, if there is an order - show user the View Order Button: hidden by default #}
+            {% if orders != "NA" %}
+                <script>
+                    document.getElementById('view-order-container').style.display = "block";
+                        $(document).ready(function(){
+                            $('view-order-container').children().css({'display': 'block'});});
+                            document.getElementById('continue-shopping').style.display = "none";
+                            document.getElementById('cancel-order').style.display = "none";
+                            document.getElementById('request-checkout').style.display = "none";
+
+                </script>
+            {% endif %}
+        </div>
+    </div>
+    <div id="launch-cam-container"><button id='launch-cam' onclick='qrScanBarcode()'>Launch Camera</button></div>
+    <br>
+    <div class="contentCol">
+    <form id="product-search" method="post" data-url="{% url 'ajax_posting' %}">
+        {% csrf_token %}
+        {{ forms.ProductForm }}
+        <button id="product-search-button" type="submit">Search Product</button>
+    </form>
+    <div id="userInfo" class="contentCol"><p>Logged in as {{ user.username }}</p>
+                <h2>UID: {{ user.id }}</h2>
+            </div>
+    </div>
+    <div class="contentRowScan">
+
+        <div class="contentCol">
+            <div class="mainSelectionNav accordion">BALANCE</div>
+                <div class="accordionBody">
+                    <h3>Your Balance is:</h3>
+                    <h1>{{ balance.current_balance }} Points</h1>
+                    <a href="/order-history/"><h3>RECENT ORDERS</h3></a>
+                    <h3 id="closeBalanceBody"
+                        onclick="document.getElementsByClassName('accordionBody')[0].style.display='none';
+                        document.getElementsByClassName('accordion')[0].classList.remove('active')">[X] CLOSE</h3>
+                </div>
+            <a href="/offers/"><div class="mainSelectionNav">OFFERS</div></a>
+            <a href="/order-history"><div class="mainSelectionNav accordion" id="order-history">ORDER HISTORY</div></a>
+            <a href="/scan/"><div id='scan-menu' class="mainSelectionNav active">SCAN & CHECKOUT</div></a><br>
+        </div>
+    </div>
+    <script>
+        accordionBalance();
+        orderStatusFade();
+        qrScanBarcode();
+        productSearch();
+        addToOrder();
+        updateOrderQty();
+    </script>
+{% endblock %}

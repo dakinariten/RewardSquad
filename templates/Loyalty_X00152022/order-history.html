@@ -1,0 +1,8 @@
+{% extends "Loyalty_X00152022/index.html" %}
+{{ order_history_flag|safe }}
+{% block order_hist %}
+<script>
+$(document).ready(function(){ document.getElementById('order-history').click()});
+</script>
+
+{% endblock %}

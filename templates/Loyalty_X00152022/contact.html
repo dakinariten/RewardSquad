@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div id="contact-container">
+<div id="contact-card">
+    <h1>Contact us</h1>
+    <h2>{{ store.store_name }}</h2>
+    <hr>
+    <h3>We'd be delighted to hear from you</h3>
+    <p>Reach out to our staff on any of these channels!</p>
+    <div id="contact-body">
+        <h3><a href="tel:{{ store.contact_no }}">TEL: {{ store.contact_no }}</a></h3>
+        <h3><a href="mailto:{{ store.email }}?Subject=Reward%20Squad">Email: {{ store.email }}</a></h3>
+        <p><a href="http://maps.google.com/?q={{ addressurl }}">Address: {{ store.address }}</a></p>
+    </div>
+</div>
+</div>
+{% endblock %}

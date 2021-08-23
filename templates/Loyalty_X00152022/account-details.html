@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_field %}
+
+{% block content %}
+    <h1>Reward Squad | Loyalty Pays</h1>
+    <h2>USER: {{ user.first_name }} {{ user.last_name }}</h2>
+    <h3>Update User Details</h3>
+    <div id="form-container">
+    <h2 id='order-status' style="color: #b01f1f; font-style: italic">{{ msg }}</h2>
+        <form id="account-details" method="post" data-url="{% url 'account_details' %}">
+        {% csrf_token %}
+            {{ user_form }}
+            {{ user_details_form.dob.label_tag }}
+            {{ user_details_form.dob }}
+            {{ user_details_form.contact_no.label_tag }}
+            {{ user_details_form.contact_no }}
+            {{ user_details_form.address.label_tag }}
+            {{ user_details_form.address }}
+            {{ user_details_form.store_selection.label_tag }}
+            {{ user_details_form.store_selection }}
+            {% if store_user.rp_acc_link == False %}
+            {{ store_user_form }}
+            {% endif %}
+
+
+            <button id="submit-user-details" name='submit-user-details' value="{{ store }}">Update Details</button>
+        </form>
+    </div>
+    <script>
+    orderStatusFade();
+    </script>
+{% endblock %}

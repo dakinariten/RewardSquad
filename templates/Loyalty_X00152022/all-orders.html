@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <h3>Hello {{ user.first_name }}</h3>
+    <h1>Your Order History</h1>
+    <h3>{{ store.store_name }} - {{ store.address }}</h3>
+{% if orders != "" %}
+    <table id="order-history-table"><tr><th class="mob-hide">ID#</th><th>€</th><th class="mob-hide">Date</th><th>Status</th><th>Action</th></tr>
+    <tbody>
+    {% for order in orders %}
+        <tr>
+        <td class="mob-hide">{{ order.id }}</td>
+        <td>{{ order.order_total }}</td>
+        <td class="mob-hide">{{ order.date|date:"Y-m-d" }}</td>
+        <td>{{ order.order_status }}</td>
+        <td><form name="order-hist-action-form" method="post">{% csrf_token %}
+            <input type="hidden" id="order_id_{{ order.id }}" name="order_id" value="{{ order.id }}">
+            <button name='pay-order' value="{{ order.id }}" type='submit' {% if order.order_status != "PENDING" %}disabled="disabled" style="visibility: hidden"{% else %}style="visibility: visible"{% endif %}><span class='material-icons'>paid</span></button>
+            <button name='view-order' value="{{ order.id }}" type='submit'><span class='material-icons'>receipt</span></button></form></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    {% if orders.has_other_pages %}
+            <ul class="pagination">
+        {% if orders.has_previous %}
+            <li><a href="?page={{ orders.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+            <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in orders.paginator.page_range %}
+            {% if orders.number == i %}
+               <li class="active"><span>{{ i }}</span></li>
+            {% else %}
+                <li><a href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if orders.has_next %}
+            <li><a href="?page={{ orders.next_page_number }}">&raquo;</a></li>
+        {% else %}
+             <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+         </ul>
+    {% endif %}
+{% endif %}
+{% endblock %}

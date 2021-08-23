@@ -1,0 +1,72 @@
+/*
+Stylesheet for Django Admin
+- Brought roughly in line with rest of application
+*/
+
+body {
+    font-family: 'Helvetica Neue', 'Arimo', 'sans-serif';
+}
+
+#header {
+    background-color: #b01f1f;
+    color: black;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding-bottom: 1.75em;
+    padding-top: 1.75em;
+}
+
+#header a:hover {
+    color: #474747!important;
+    text-decoration: none;
+}
+
+#user-tools {
+    font-size: .7em;
+}
+
+.object-tools li .addlink {
+    background: initial;
+    background-color: #b01f1f;
+    color: white;
+}
+
+input[type=submit] {
+    background-color: #b01f1f;
+}
+
+.default {
+    background-color: #474747!important;
+}
+
+a {
+    color: white!important;
+}
+
+.breadcrumbs {
+    background-color: #474747!important;
+    color: white;
+}
+
+table caption {
+    background-color: #474747!important;
+    color: white;
+}
+
+table a {
+    color: black!important;
+    font-weight: initial;
+}
+
+table caption a {
+    color: white!important;
+}
+
+h2 {
+    background-color: #474747!important;
+    color: white!important;
+}
+
+#changelist-filter a {
+    color: black!important;
+}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_field %}
+
+{% block content %}
+
+
+    {% if user_type == "MCHT" or user_type == "ADMIN" %}
+        <h1>{{ store.store_name }}</h1>
+        <h3>User Management</h3>
+        <h2 id="order-status">{{ status }}</h2>
+
+        <table id="store_users"><tr><th class="mob-hide">ID#</th><th>NAME</th><th>USER TYPE</th><th>ACTION</th></tr>
+        <tbody>
+        {% if user_search == None %}
+            {% for user in user_list %}
+            <tr><form class="user-mgmt-role" method="post">{% csrf_token %}
+                <td class="mob-hide">{{ user.ID }}</td>
+                <td>{{ user.name }}</td>
+                <td><select id="choose-role" name="choose-role">{{ user.user_type|safe }}</select></td>
+                <td><button name="user-mgmt-submit" type="submit" value="{{ user.ID }}">UPDATE</button></td>
+            </form></tr>
+            {% endfor %}
+        {% endif %}
+        </tbody></table>
+        {% if user_list.has_other_pages %}
+                <ul class="pagination">
+              {% if user_list.has_previous %}
+                <li><a href="?page={{ user_list.previous_page_number }}">&laquo;</a></li>
+              {% else %}
+                <li class="disabled"><span>&laquo;</span></li>
+              {% endif %}
+              {% for i in user_list.paginator.page_range %}
+                {% if user_list.number == i %}
+                   <li class="active"><span>{{ i }}</span></li>
+                {% else %}
+                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if user_list.has_next %}
+                <li><a href="?page={{ user_list.next_page_number }}">&raquo;</a></li>
+            {% else %}
+                 <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+             </ul>
+        {% endif %}
+    {% else %}
+        {% if user_type == "CUST" %}
+            <meta http-equiv="refresh" content="6; /" />
+        {% else %}
+            <meta http-equiv="refresh" content="6; /shop/" />
+        {% endif %}
+        <h1>Hello {{ user.first_name }}</h1>
+        <h3>Bad News...</h3>
+        <p>You do not have permission to view this page.</p>
+        <p>If you feel this is in error, please contact {{ store.store_name }}</p>
+        <p>You can also reach out to <a id="usr-mgmt-suprt-contact" href="/support/">SUPPORT</a> if you believe it is a technical issue.</p>
+{% endif %}
+    <script>orderStatusFade();</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{%  extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+{#    <meta http-equiv="refresh" content="10" />#}
+    <div class="contentRow">
+    {% block qr %}
+        <div class="contentCol">
+            <h1 style="text-align: center" id="order-status">{{ STATUS }}</h1>
+            <div id="qrcode">{{ svg|safe }}
+            <script>qrCodeViewBox();</script>
+            </div>
+            <div id="userInfo"><p>Logged in as {{ user.username }}</p>
+                <h2>UID: {{ user.id }}</h2>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    {% block order_hist %}{% endblock %}
+    <br>
+    <div class="contentRow">
+        <div class="contentCol">
+            <div class="mainSelectionNav accordion" id="balance-check" data-url="{% url 'index' %}">BALANCE</div>
+                <div class="accordionBody">
+                    <h3>Your Balance is:</h3>
+                    <span id="balance-output"><h1 id="balance-output-h1">{{ balance.current_balance }} Points</h1></span>
+                    <a href="/order-history/" onclick="location.reload();"><h3>RECENT ORDERS</h3></a>
+                    <h3 id="closeBalanceBody"
+                        onclick="document.getElementsByClassName('accordionBody')[0].style.display='none';
+                        document.getElementsByClassName('accordion')[0].classList.remove('active')">[X] CLOSE</h3>
+                </div>
+            <a href="/offers/"><div class="mainSelectionNav">OFFERS</div></a>
+            <div class="mainSelectionNav accordion" id="order-history">ORDER HISTORY</div>
+            <div class="accordionBody" id="order-history-body">
+                    <form id="order-history-form" method="post" data-url="{% url 'index' %}">
+                        {% csrf_token %}
+                        <div id="table-container">
+                            <table id="order-table"></table>
+                        </div>
+                    </form>
+                </div>
+            <a href="/scan"><div id="scan-menu" class="mainSelectionNav">SCAN & CHECKOUT</div></a><br>
+        </div>
+    </div>
+    <script>
+        accordionBalance();
+        customerBalanceCheck();
+        orderHistory();
+        custOrderHistory();
+        orderStatusFade();
+    </script>
+{% endblock %}

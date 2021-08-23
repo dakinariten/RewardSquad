@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Arimo:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'js/rewardSquad.js' %}"></script>
+    <meta charset="UTF-8">
+    <title>Reward Squad</title>
+</head>
+<body>
+<div id="userIcon">
+{# If user is logged in, fetch the logo of their chosen store & their user icon - otherwise register/login #}
+    {% if user.is_authenticated %}
+        <img style="display: none" id="userIcon-img" src="{% static 'images/icons/'|add:icon_type.user_type|add:'.png' %}">
+    {% else %}
+        <img style="display: none" id="userIcon-img" src="{% static 'images/icons/CUST.png' %}">
+    {% endif %}</div>
+<div id='rSquadNavContainer'>
+{# Navigation bar - controlled by Javascript #}
+    <div id="rSquadNav" class="sidenav">
+      <a id='closeNav' href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <h2><a href="/">REWARD SQUAD</a></h2>
+        <h1>MENU</h1>
+        <br>
+    <form id="account-details" method="post" data-url="{% url 'account_details' %}"} style="display: none">
+        {% csrf_token %}
+        <input type="hidden" name='store_id_hidden' value="{{ store.id }}"><input id="acc-detail-hidn-sbmt" style="display: none" type="submit" name='hidden-form-acc-details' value="{{ store.id }}">
+    </form>
+      <a href="/account-details/">ACCOUNT DETAILS</a>
+      <a href="/order-history/" onclick="closeNav();">ORDER HISTORY</a>
+      <a href="/offers/">VIEW OFFERS</a>
+      <div id='navStore'>
+          <a href="/contact/">CONTACT STORE</a>
+          <a href="/choose-store/">CHANGE STORE</a>
+          <a id='support-mail' href="mailto:support@rewardsquad.ie?subject=Support&body=Message">SUPPORT</a>
+      </div>
+        <div id="staff-nav">
+            {% if icon_type.user_type in "MCHT,CLRK,ADMN" %}
+                <h3><a href="/shop/">{{ store.store_name }} MENU</a></h3>
+            {% endif %}
+        </div>
+      <a id='navLogout' href="/accounts/logout">{% if login == "LOGIN" %}{{ login }}{% else %}LOGOUT{% endif %}</a>
+    </div>
+    <span id="navHamburger" onclick="openNav()">&#9776;</span>
+</div>
+<div id="content-container">
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+<footer><div class="footRow">
+    <a href="/"><div class="footCol material-icons"><span class="material-icons-round">
+home
+    </span></div></a>
+    <a href="/offers/"><div class="footCol material-icons"><span class="material-icons-round">
+local_offer
+    </span></div></a>
+    <div id='footLogo' class="footCol"><img id="foot-logo-img" style='display: none' src="{% static store.logo_url %}"></div>
+    <a href="/scan/"><div class="footCol material-icons"><span class="material-icons-round">
+photo_camera
+    </span></div></a>
+    <a href="/order-history/"><div class="footCol material-icons"><span class="material-icons-round">
+receipt_long
+    </span></div></a>
+</div></footer>
+<script>
+    loadLogoIcon();
+    closeNav();
+    supportLinkDevice();
+</script>
+</body>
+</html>

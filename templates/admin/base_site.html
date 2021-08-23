@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Admin') }}{% endblock %}
+  
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'shop' %}">Reward Squad</a></h1>
+{% endblock %}
+
+{% block nav-global %}
+{#    Custom links for staff - bring back to main shop page #}
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <a href="/shop">Main Menu</a>
+    <a href="/shop/checkout">Checkout</a>
+    <a href="/shop/#shop-rp-balance">Points</a>
+{% endblock %}

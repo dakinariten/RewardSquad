@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load crispy_forms_field %}
+{% load static %}
+
+{% block content %}
+    {% if order_status != "" %}
+            <h1 id="order-status">{{ order_status }}</h1>
+        <script>
+        window.onload = function() {
+            document.getElementById('show-input').style.display = "none";
+            document.getElementById('complete-order').style.display = "none";
+            document.getElementById('payment-content-container').style.display = "none";
+        }
+        </script>
+            <meta http-equiv="refresh" content="4; /" />
+    {% endif %}
+    {% if order == "No order found." %}
+        <h1>Error. No orders found</h1>
+        <h3>You may have reached this page by accident</h3>
+        <p>Please contact support, if you feel there is a problem!</p>
+        <meta http-equiv="refresh" content="4; /" />
+    {% endif %}
+    {% if order != "No order found." %}
+        <div id="payment-content-container">
+            <div id="order-summary">
+                <table id="order-summary-table">
+                    <thead>
+                    <tr><th class="tbl-prod-title">Product</th><th>QTY</th><th>€</th><th class="mob-hide">Sub-Total</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for i in products %}
+                        <tr><td class="tbl-prod-title">{{ i.Product }}</td><td>{{ i.QTY }}</td><td>{{ i.Amt|floatformat:2 }}</td><td class="mob-hide">{{ i.SubTotal|floatformat:2 }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div id="payment-container">
+                <div id="user-details-container">
+                    <h1>User ID: {{ user_id }}</h1>
+                    <h3>Current Balance: {{ balance }}</h3>
+                </div>
+                <form id="rp-payment" method="post" data-url="{% url 'payment' %}">
+                    {% csrf_token %}
+                    <button type="submit" id="show-input" onclick="payWithRP();">Use Reward Points</button><input type="number" max="{% if balance > order_amt %}{{ order_amt }}{% else %}{{ balance }}{% endif %}" min="0" id="reward-points-spent">
+                </form>
+                <div id="order-balance">
+                    <h2 id="update-amount-due">Amount to Pay: €{{ order_amt|floatformat:2 }}</h2>
+                </div>
+                <div id="customer-rp-details-container">
+                    <form id="customer-rp-details" method="post" data-url="{% url 'payment' %}">
+                        {% csrf_token %}
+                        {{ form.total_points_earned.as_hidden }}
+                        {{ form.total_points_spent.as_hidden }}
+                        {{ form.payment }}
+                        <input type="hidden" name="order-amount" id="order-amount" value="{{ order_amt|floatformat:2 }}">
+                        <input type="hidden" name="order-id" id="order-id-hidden" value="{{ order }}">
+                        <button id="complete-order" name='complete-payment' type="submit">Complete Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script>
+            orderStatusFade();
+        </script>
+    {% endif %}
+{% endblock %}

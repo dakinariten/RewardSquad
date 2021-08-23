@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <h1>Order ID: {{ order.id }}</h1>
+    <h2>{{ order.order_status }}</h2>
+    <div id="actions-container">
+        <form id="order-actions" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="order-id" id="order-id" value="{{ order.id }}">
+        {% if order.order_status == "NOT PLACED" %}
+            <button type="submit" name="submit" value="{{ order.id }}"><span class="material-icons">edit_note</span>edit</button>
+        {% endif %}
+        {% if order.order_status == "PENDING" %}
+            <button name="pay-order" id="pay-order" value="{{ order.id }}"><span class="material-icons">paid</span>Pay Now</button>
+        {% endif %}
+        {% if order.order_status == "NOT PLACED" or order.order_status == "PENDING" %}
+            <button type="cancel" name="cancel" value="{{ order.id }}"><span class="material-icons">block</span>cancel</button>
+        {% endif %}
+        </form>
+    </div>
+    <div id="store-details">
+    <h2>{{ store.store_name }}</h2>
+    {{ store.address }}<br>
+        TEL: {{ store.contact_no }}<br>
+    Email: {{ store.email }}
+    </div>
+    <table id="order-summary">
+    <tr><th class="mob-hide">Code</th><th>QTY</th><th>Product</th><th>Price €</th></tr>
+    {% for item in order_item %}
+        <tr>
+        {% for key, value in item.items %}
+            {% if key == "CODE" %}
+                <td class='mob-hide'>{{ value }}</td>
+            {% elif key == "PRODUCT" %}
+                <td class='tbl-prod-title'>{{ value }}</td>
+            {% else %}
+            <td>{{ value }}</td>
+            {% endif %}
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+<button id="view-order-home" type="button" onclick="location.href='/'">Back to Home</button>
+{% endblock %}

@@ -1,0 +1,109 @@
+{%  extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+<script src="{% static 'js/html5-qrcode.min.js' %}"></script>
+{% if staff == "NOT STAFF" %}
+    <div>
+{#    If you're not staff - display message, and force redirect#}
+        <meta http-equiv="refresh" content="4; /" />
+        <h1>ERROR - You do not Have Permission to View Page</h1>
+        <h3>If you believe this to be in error, please contact Support</h3>
+    </div>
+{% endif %}
+{% if staff != "NOT STAFF" %}
+    {% if store_user not in staff %}
+        <h1>This is embarrassing...</h1>
+        <h3>This section is reserved for staff members of {{ store.store_name }}</h3>
+        <p>You may have changed to a different store, or be looking for another page! To change store, click the link below.</p>
+        <p>Otherwise, click any of the other links (or wait - you will be redirected shortly)</p>
+        <button id="choose-store-shop" onclick="window.location.href='/choose-store/'">Choose Store</button>
+        <meta http-equiv="refresh" content="60; /" />
+    {% endif %}
+    {% if store_user in staff %}
+    {# If you are Staff, display main Content #}
+        <div class="contentRowShop">
+            <div id="userInfo" class="contentCol">
+                {% if msg is not None %}
+{#                    Display message when redirected from adjust-points #}
+                    {{ msg|safe }}
+                {% endif %}
+    {#            Remind user what store they're viewing & position #}
+                <h1>{{ status }}</h1>
+                <p>Logged in as {{ user.username }}</p>
+                <h2>User Type: {{ staff.0.user_type }}</h2>
+                <h3>Store: {{ staff.0.store_id }}</h3>
+            </div>
+        </div>
+        <br>
+        <div class="contentRowShop">
+            <div id="shop-content-col-container" class="contentCol">
+                <div class="mainSelectionNav accordion" id="shop-rp-balance">REWARD POINTS</div>
+                    <div class="accordionBody" id="balance">
+                        <div class="pointsContainer">
+                            <br>
+                            <div id="error-output" style="display: none;"></div>
+                            <div id='scanContainer' class="scanContainer">
+                            <h3 id="scan-header">Scan User QR Code</h3>
+                                <div>
+                                    <div id="qr-reader"></div>
+                                    <div id="qr-reader-results"></div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="pointsForm">
+                                    <div id="output"></div>
+                                <form method="post" id="balance-check" data-url="{% url 'ajax_posting' %}" style="display: none">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="user_id"  min=0 name="bal-check" value="" placeholder="Enter the UID here" required>
+                                    <input type="hidden" id="store_id" name="store-check-submit" value="{{ staff.0.store_id }}">
+                                    <input id="balance-check-submit" type="submit" name="submit2" value="RETRIEVE BALANCE" style="visibility: hidden">
+                                </form>
+                                <button id="launch-cam-qrbal" onclick="relaunchLookup();" style="display: none">Look-up Another User</button>
+                                <div id="manual-uid-search">
+                                    <a id="enter-manually" onclick="manualQrBalance();" ><p>enter uid manually</p></a>
+                                </div>
+                                <form id="updateBalance" method="post">
+                                    {% csrf_token %}
+                                    <br>
+                                    <label for="id_points_earned"><h4>Choose Transaction Type: </h4></label>{{ points_form.points_earned }}
+                                    <br><br>
+                                    <label for="id_points_amount"><p>Amount of Points: </p></label>{{ points_form.points_amount }}
+                                    <br><br>
+                                    <label for="id_user_id"><p>User ID: </p></label>{{ points_form.user_id }} <span><p>*Scan QR Code, or enter UID</p></span>
+                                    <br><br>
+                                <button type="submit" name="points-form-submit">Submit</button></form>
+                            </div>
+                        </div>
+                    </div>
+
+                <a href="/shop/checkout/"><div id="" class="mainSelectionNav">CHECKOUT</div></a>
+                <a href="/register"><div class="mainSelectionNav">ADD CUSTOMER</div></a>
+                <div class="mainSelectionNav accordion" id="pending-orders" name="pending-orders" value="1" data-url="{% url 'shop' %}">PENDING ORDERS</div>
+                    <div class="accordionBody" id="pending-orders-body">
+                        <form id="order-update" method="post" data-url="{% url 'shop' %}">
+                            {% csrf_token %}
+                            <div id="table-container"><table id="order-table"></table></div>
+                        </form>
+                    </div>
+                {% if staff.0.user_type == "MCHT" %}
+                    <a href="/user-management/"><div id="" class="mainSelectionNav">USER MANAGEMENT</div></a>
+                    <a href="#"><div id="" class="mainSelectionNav">VIEW ANALYTICS</div></a>
+                    <a href="/adjust-points/"><div id="" class="mainSelectionNav">ADJUST POINTS</div></a>
+                    <a href="/shop/submit-product/"><div id="" class="mainSelectionNav">SUBMIT PRODUCT INFORMATION</div></a>
+                    {% endif %}
+                <br>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+    <script>
+        accordionBalance();
+        balanceCheckAjax();
+        qrScanPoints();
+        pendingOrders();
+        approveDenyPending();
+        shopRewardPoints();
+        orderStatusFade();
+    </script>
+{% endblock %}
