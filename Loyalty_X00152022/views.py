@@ -252,11 +252,15 @@ def offers(request):
             new_title = str(request.POST.get('offer-title'))
             new_text_short = str(request.POST.get('offer-text-short'))
             new_text_long = str(request.POST.get('offer-text-long'))
+            new_end_date = request.POST.get('offer-end-date')
+            new_start_date = request.POST.get('offer-start-date')
             offer.user_id = user
             offer.price = new_price
             offer.offer_title = new_title
             offer.offer_text_short = new_text_short
             offer.offer_text_long = new_text_long
+            offer.date_end = new_end_date
+            offer.date_start = new_start_date
             if request.POST.get('image-select') != "":
                 if request.FILES['image-select']:
                     image = request.FILES['image-select']
@@ -290,6 +294,7 @@ def shop(request):
     store = models.Store.objects.get(id=models.UserDetails.objects.get(user_id=request.user.id).store_selection_id)
     context['store_user'] = models.StoreUser.objects.get(user_id=request.user.id, store_id=store.id)
     staff = rp.staff_check(request=request)
+    print(request.POST)
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         if request.POST.get('id') == "pending-orders":
             all_pending_orders = models.Order.objects.filter(order_status="PLACED").order_by('-date')
@@ -1031,6 +1036,8 @@ def order_history(request):
         elif "submit" in request.POST:
             return scan(request)
         elif "pay-order" in request.POST:
+            return payment(request)
+        elif "complete-payment" in request.POST:
             return payment(request)
         elif "cancel" in request.POST:
             return index(request)

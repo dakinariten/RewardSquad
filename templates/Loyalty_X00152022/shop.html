@@ -29,7 +29,7 @@
                     {{ msg|safe }}
                 {% endif %}
     {#            Remind user what store they're viewing & position #}
-                <h1>{{ status }}</h1>
+                <h1 id="order-status">{{ status }}</h1>
                 <p>Logged in as {{ user.username }}</p>
                 <h2>User Type: {{ staff.0.user_type }}</h2>
                 <h3>Store: {{ staff.0.store_id }}</h3>

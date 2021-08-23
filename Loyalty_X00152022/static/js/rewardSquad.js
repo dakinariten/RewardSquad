@@ -6,7 +6,7 @@ function getCookie(name) {
       for (let i = 0; i < cookies.length; i++) {
           const cookie = cookies[i].trim();
           // Does this cookie string begin with the name we want?
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          if (cookie.substring(0, name.length + 1) == (name + '=')) {
               cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
               break;
           }
@@ -110,7 +110,7 @@ function cartButtonsDisplay() {
     document.getElementById('order-buttons').style.display = 'block';
     $(document).ready(function(){
         $('order-buttons').children().css({'display': 'block'});});
-    } else if (document.getElementById('product-price').innerHTML === "") {
+    } else if (document.getElementById('product-price').innerHTML == "") {
         document.getElementById('order-buttons').style.display = 'none';
         $(document).ready(function(){
         $('order-buttons').children().css({'display': 'none'});});
@@ -120,7 +120,7 @@ function cartButtonsDisplay() {
 // Order Status - Display Settings
 function orderStatusFade() {
     let status = document.getElementById('order-status').innerHTML;
-    if (status === "") {
+    if (status == "") {
         document.getElementById('order-status').style.display = "none";
         $('#order-status').children().css({'display': 'none'});
     } else {
@@ -191,7 +191,7 @@ function viewOrder() {
 // Contained in one Modal window; edit shows & hides all necessary inputs & buttons
 function editOffers(offerID) {
     let offer_id = offerID;
-    if (document.getElementById("offer-title-"+offer_id).style.display === "none") {
+    if (document.getElementById("offer-title-"+offer_id).style.display == "none") {
         document.getElementById("offer-title-" + offer_id).style.display = "block";
         document.getElementById("offertitle-" + offer_id).style.display = "none";
         document.getElementById("image-select-" + offer_id).style.display = "block";
@@ -212,7 +212,7 @@ function editOffers(offerID) {
         document.getElementById("offer-end-date-"+ offer_id).style.display = "block";
         let label_list = document.querySelectorAll('#offer-' + offerID + '-form label');
         for (let i = 0; i < label_list.length; i++) {
-            if (label_list[i].id === "qtylabel-" + offer_id) {
+            if (label_list[i].id == "qtylabel-" + offer_id) {
 
             } else {
                 label_list[i].style.display = "block";
@@ -242,7 +242,7 @@ function editOffers(offerID) {
         document.getElementById("offer-end-date-"+ offer_id).style.display = "none";
         let label_list = document.querySelectorAll('#offer-' + offerID + '-form label');
         for (let i = 0; i < label_list.length; i++) {
-            if (label_list[i].id === "qtylabel-" + offer_id) {
+            if (label_list[i].id == "qtylabel-" + offer_id) {
 
             } else {
                 label_list[i].style.display = "none";
@@ -380,6 +380,12 @@ function qrUidCheckout() {
 
                  });
 
+}
+// Set value of hidden field (determine order ID and status to change)
+// used by Pending Orders
+function setIdHiddenOrder(order_id) {
+    // set on dynamically generated elements; used in views.py
+    document.getElementById('order-id-status').value = order_id;
 }
 
 // If order == €0; disable "proceed to payment"
@@ -657,7 +663,7 @@ function rpOrderTotalUpdate() {
                  dataType: "json",
                 },
                 success: function(data){
-                    if (data.balance === 0.0) {
+                    if (data.balance == 0.0) {
                         document.getElementById('id_payment').style.display = "none";
                         document.getElementById('id_payment_0').required = false;
                         document.getElementById('id_payment_1').required = false;
