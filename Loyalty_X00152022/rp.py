@@ -210,9 +210,13 @@ def link_account(rs_user_id, store_id):
                                                            rsquad_user.last_name) or (i[0] == store_user.online_uid):
                             link_account_bool = True
                     if link_account_bool:
+                        offline_balance = check_balance(user_id=store_user.user_id, store_id=store_user.store_id)
                         store_user.rp_acc_link = True
                         store_user.save()
                         online_bal = reward_point_balance(store_user=store_user, store_rp=store_rp)
+                        reward_point_balance(store_user=store_user, store_rp=store_rp, action="Update",
+                                             points_amount=offline_balance)
+
                         return store_user
 
         else:
