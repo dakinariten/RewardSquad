@@ -243,6 +243,7 @@ def offers(request):
         elif "cancel-order" in request.POST:
             return scan(request)
         elif request.POST.get('save-offer'):
+            print(request.POST)
             user = request.user.id
             store = models.UserDetails.objects.get(user_id=user).store_selection_id
             offer_id = int(request.POST.get('save-offer'))
@@ -256,11 +257,12 @@ def offers(request):
             offer.offer_title = new_title
             offer.offer_text_short = new_text_short
             offer.offer_text_long = new_text_long
-            if request.FILES['image-select']:
-                image = request.FILES['image-select']
-                fss = FileSystemStorage(location='Loyalty_X00152022/static/Offers')
-                fss.save(image.name, image)
-                offer.image_url = '/Offers/'+str(image)
+            if request.POST.get('image-select') != "":
+                if request.FILES['image-select']:
+                    image = request.FILES['image-select']
+                    fss = FileSystemStorage(location='Loyalty_X00152022/static/Offers')
+                    fss.save(image.name, image)
+                    offer.image_url = '/Offers/'+str(image)
             offer.save()
         elif request.POST.get('create-offer-save'):
             title = request.POST.get('create-offer-title')

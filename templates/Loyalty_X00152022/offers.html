@@ -92,7 +92,7 @@
                                     <div class="offer-row">
                                         <div class="offer-image-container">
                                                 <label for="image-select-{{ offer.id }}" style="display: none">Upload main image for offer</label>
-                                                <input type="file" id="image-select-{{ offer.id }}" name="image-select" value='test' style="display: none" accept="image/*">
+                                                <input type="file" id="image-select-{{ offer.id }}" name="image-select" value='{{ offer.id }}' style="display: none" accept="image/*" >
                                             <img id="offerimage-{{ offer.id }}" src="{% static offer.image_url %}">
                                         </div>
                                     </div>
@@ -114,7 +114,7 @@
                                 <div class="modal-footer">
                                     <input name="offer-price" type="hidden" value="{{ offer.price }}" id="offer-price-{{ offer.id }}">
                                     <label id="qtylabel-{{ offer.id }}" for="qty-{{ offer.id }}">Quantity:</label>
-                                    <input default="1" type="number" name="qty" id="qty-{{ offer.id }}" min=0 placeholder="Enter Quantity" required>
+                                    <input value="1" type="number" name="qty" id="qty-{{ offer.id }}" min=0 placeholder="Enter Quantity" required>
                                     <button name="cart" value="{{ offer.id }}" id='cart-{{ offer.id }}' type="submit">Add to Cart</button>
                                     {% if store_user in staff %}
                                         <button id="edit-{{ offer.id }}" name="edit-offer" type="button" onclick="editOffers({{ offer.id }})" class="btn btn-success">Edit Offer</button>
